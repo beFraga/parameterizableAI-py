@@ -2,8 +2,19 @@ import pandas as pd
 import numpy as np
 import json
 import scipy.stats as sps
+from PIL import Image as pili
 from Activation import *
 from Losses import *
+from Layer import Dense
+
+
+'''
+CAMADA DE CONVOLUCAO
+INTERFACE GRAFICA + PAINT
+SALVAR IMAGEM
+FAZER NP ENTRAR NA PORRA DO JSON
+SELF.NETWORK
+'''
 
 class AI:
 	def __init__(self, config: int, new: bool, loss=MSE, act=ReLU, mH=3, nH=10, l_rate=0.1, epochs=100):
@@ -24,18 +35,28 @@ class AI:
 		self.loss = classes[obj["loss"]]
 		self.epochs = int(obj["epochs"])
 		self.l_rate = float(obj["l_rate"])
+		bias = obj["bias"]
+		weight = obj["weight"]
+
+		#for i in weight:
+		#	print(i)
+		self.network = network
 
 		# -------- FALTA PEGAR O NH E MH E FAZER A SELF.NETWORK --------------------
 		
 
 	def set_params(self, n, mH, nH, act, loss, epochs, l_rate):
+		bias = np.random.randn(nH, mH)
+		weight = np.random.randn(nH, nH, mH)
+		# ------------------- FAZER ESSA MERDA ENTRAR NO JSON ------------------
+		
 		c = {
-			mH: mH,
-			nH: nH,
-			act: act,
-			loss: loss,
-			epochs: epochs,
-			l_rate: l_rate
+			"act": act,
+			"loss": loss,
+			"epochs": epochs,
+			"l_rate": l_rate,
+			"bias": bias.tolist(),
+			"weight": weight.tolist()
 		}
 
 		with open('config.json') as fp:
@@ -51,12 +72,12 @@ class AI:
 
 	def remove_param(self, n):
 		with open('config.json') as fp:
-			listJson = json.load(fp):
+			listJson = json.load(fp)
 
 		listJson[n] = {}
 
 		with open('config.json', 'w') as json_file:
-			json.dump(listJson, json_file, indent=4, separators(',', ': '))
+			json.dump(listJson, json_file, indent=4, separators=(',', ': '))
 		
 
 	@staticmethod
@@ -87,6 +108,12 @@ class AI:
 		
 		return output
 
+	def image_to_np(self):
+		img = pili.open('temp.png')
+		imgnp = np.asarray(img)
+		imgnp = np.dot(imgnp[...,:3], [0.2989, 0.587, 0.114])
+		return imgnp
+
 
 classes = {"Sigmoid": Sigmoid, "ReLU": ReLU, "MSE": MSE}
 
@@ -94,7 +121,8 @@ classes = {"Sigmoid": Sigmoid, "ReLU": ReLU, "MSE": MSE}
 
 def main():
 	print('Rodando')
-	AI.get_params()
+	ai = AI(0, True)
+	
 
 
 if __name__ == "__main__":
