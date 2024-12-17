@@ -19,7 +19,7 @@ class MSE(Losses):
 		def dmse(true, pred):
 			return 2 * (true - pred) / np.size(true)
 
-		super().__init__(self, mse, dmse)
+		super().__init__(mse, dmse)
 
 
 __all__ = ["MSE"]
