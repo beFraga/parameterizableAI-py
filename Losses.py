@@ -1,4 +1,5 @@
 from Layer import Layer
+import numpy as np
 
 class Losses(Layer):
 	def __init__(self, loss, dloss):
@@ -9,6 +10,8 @@ class Losses(Layer):
 		return self.loss(true, pred)
 	
 	def backward(self, true, pred):
+		print("true", true.shape)
+		print("pred", pred.shape)
 		return self.dloss(true, pred)
 
 class MSE(Losses):

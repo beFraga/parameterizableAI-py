@@ -1,4 +1,5 @@
 from Layer import Layer
+import numpy as np
 
 class Activation(Layer):
 	def __init__(self, act, dact):
@@ -10,7 +11,9 @@ class Activation(Layer):
 		return self.act(self.input)
 
 	def backward(self, o_grad, l_rate):
-		return o_gradient * self.dact
+		print("o", o_grad.shape)
+		print("dact", self.dact(self.input)[np.newaxis, :].shape)
+		return o_grad @ self.dact(self.input)[np.newaxis, :]
 
 class ReLU(Activation):
 	def __init__(self):
@@ -36,11 +39,13 @@ class Sigmoid(Activation):
 class SoftMax(Activation):
 	def __init__(self):
 		def softmax(x):
-			exps = np.exp(x - exp.max(x, axis=-1, keepdims=True))
-			return exps / np.sum(exps, axis=-1, keepdims=True)
+			tmp = np.exp(x)
+			self.output = tmp / np.sum(tmp)
+			return self.output
 
 		def dsoftmax(x):
-			return np.diagflat(x) - np.dot(x, x.T)
+			n = np.size(self.output)
+			return np.dot((np.identity(n) - self.output.T) * self.output, o_grad)
 
 		super().__init__(softmax, dsoftmax)
 
